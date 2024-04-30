@@ -1,0 +1,10 @@
+# Dependencies for the algorithm
+tqdm
+numpy
+scipy
+pandas
+pytorch
+
+# Generate figures
+matplotlib
+seaborn

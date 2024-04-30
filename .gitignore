@@ -1,0 +1,31 @@
+# In-house data
+data/
+dmrs/
+Metadata_EMseqsamples.xlsx
+table1.csv
+sim-results/
+results/
+
+# External tools
+CancerLocator.jar
+celfie.py
+
+*.slurm
+*.pyc
+*.c
+*.npy
+*.npz
+*.pkl
+*.swp
+*.log
+*.pt
+*.png
+*.eps
+*.pickle
+
+tmp/
+venv/
+dist/
+build/
+.idea/
+*.egg-info/
