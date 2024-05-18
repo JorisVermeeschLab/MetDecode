@@ -39,7 +39,7 @@ def fig_a():
             with open(filepath, 'rb') as f:
                 data = pickle.load(f)
             data = data[0]
-            res.append([data[method_name]['sim']['mse'] for method_name in METHOD_NAMES])
+            res.append([data[method_name]['sim']['pearson'] for method_name in METHOD_NAMES])
         res = np.asarray(res)
 
         #colors = ['darkblue', 'royalblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
@@ -49,18 +49,40 @@ def fig_a():
             'Erythroblast', 'Monocyte', 'Natural killer cell', 'Neutrophil', 'Average']
         plt.figure(figsize=(12.5, 7.5))
         for k in range(15):
-            ax = plt.subplot(6, 5, 10 * (k // 5) + (k % 5) + 1)
-            if k == 13:
+            ax = plt.subplot(3, 5, k + 1)
+
+            if k == 14:
+                plt.axis('off')
+                ys = list(np.mean(res, axis=2).T)
+            elif k == 13:
                 ys = list(np.mean(res, axis=2).T)
             else:
                 ys = list(res[:, :, k].T)
 
-            p_value = ttest_rel(ys[-1], ys[-2], alternative='less').pvalue
+            p_value = float(np.max([ttest_rel(ys[-1], ys[i], alternative='greater').pvalue for i in range(0, len(ys) - 1)]))
 
-            ys = [ys[0]]
+            #r = plt.violinplot(ys, positions=range(1, len(ys) + 1), showmeans=True, showextrema=True)
+            #r['cbars'].set_colors(colors[1:len(ys)+1])
+            #r['cmins'].set_colors(colors[1:len(ys)+1])
+            #r['cmaxes'].set_colors(colors[1:len(ys)+1])
+            #r['cmeans'].set_colors(colors[1:len(ys)+1])
+            #for k2, body in enumerate(r['bodies']):
+            #    body.set_color(colors[k2 + 1])
+            #plt.grid(alpha=0.4, color='grey', linewidth=0.5, linestyle='--')
+            plt.xticks([], [])
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+
+            def forward(x):
+                mask = (x > 0.9)
+                return mask * (10 * (x - 0.9) + 0.9) + (~mask) * x
+            def backward(x):
+                mask = (x > 0.9)
+                return mask * (0.1 * (x - 0.9) + 0.9) + (~mask) * x
+            ax.set_yscale('function', functions=(forward, backward))
 
             if k < 14:
-                r = plt.violinplot(ys, showmeans=True, showextrema=True)
+                r = ax.violinplot(ys, showmeans=True, showextrema=True)
                 r['cbars'].set_colors(colors[:len(ys)])
                 r['cmins'].set_colors(colors[:len(ys)])
                 r['cmaxes'].set_colors(colors[:len(ys)])
@@ -69,9 +91,11 @@ def fig_a():
                     body.set_color(colors[k2])
                 plt.title(f'{pretty_names[k]} ({p_value:.3f})')
                 plt.grid(alpha=0.4, color='grey', linewidth=0.5, linestyle='--')
-                plt.xticks(range(1, len(ys) + 1), [''] * len(ys))
+                #plt.xticks(range(1, len(ys) + 1), [''] * len(ys))
                 for side in ['right', 'top', 'bottom']:
                     ax.spines[side].set_visible(False)
+                ax.set_yticks(list(ax.get_yticks()) + [1])
+                ax.set_ylim([None, 1])
             else:
                 plt.legend(handles=[
                     mpatches.Patch(color=colors[0], label='CelFIe'),
@@ -82,37 +106,6 @@ def fig_a():
                 ])
                 plt.axis('off')
                 continue
-
-            d = 0.015
-            ax.plot((-d, +d), (-d, +d), transform=ax.transAxes, color='k', clip_on=False)
-
-            ax = plt.subplot(6, 5, 10 * (k // 5) + (k % 5) + 1 + 5, sharex=ax)
-
-            if k == 14:
-                plt.axis('off')
-            elif k == 13:
-                ys = list(np.mean(res, axis=2).T)
-            else:
-                ys = list(res[:, :, k].T)
-            ys = ys[1:]
-
-            p_value = ttest_rel(ys[-1], ys[-2], alternative='less').pvalue
-
-            r = plt.violinplot(ys, positions=range(2, len(ys) + 2), showmeans=True, showextrema=True)
-            r['cbars'].set_colors(colors[1:len(ys)+1])
-            r['cmins'].set_colors(colors[1:len(ys)+1])
-            r['cmaxes'].set_colors(colors[1:len(ys)+1])
-            r['cmeans'].set_colors(colors[1:len(ys)+1])
-            for k2, body in enumerate(r['bodies']):
-                body.set_color(colors[k2 + 1])
-            plt.grid(alpha=0.4, color='grey', linewidth=0.5, linestyle='--')
-            plt.xticks([], [])
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-
-            d = 0.015
-            ax.plot((-d, +d), (1-d, 1+d), transform=ax.transAxes, color='k', clip_on=False)
-            ax.plot((0, 0), (1, 1.7), linestyle='--', alpha=0.6, linewidth=0.5, transform=ax.transAxes, color='k', clip_on=False)
 
         plt.tight_layout()
         plt.savefig(os.path.join(OUT_DIR, 'lo-res', f'sim-unk1.png' if EXP1 else f'sim-coverage.png'), dpi=1200)
@@ -255,4 +248,4 @@ def fig_c():
     plt.savefig(os.path.join(OUT_DIR, 'hi-res', f'sim-loo.png'), dpi=1200)
 
 
-fig_c()
+fig_a()

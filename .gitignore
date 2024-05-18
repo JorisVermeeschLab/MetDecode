@@ -5,6 +5,7 @@ Metadata_EMseqsamples.xlsx
 table1.csv
 sim-results/
 results/
+results-copy/
 
 # External tools
 CancerLocator.jar

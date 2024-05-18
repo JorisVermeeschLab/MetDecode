@@ -1,6 +1,5 @@
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
-import tqdm
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,7 +48,7 @@ def create_mask(marker_filepath, atlas_filepath, out_filepath, out_filepath2):
 
     p_values = []
     margins = []
-    for k, (cell_type, chrom, start, end) in enumerate(tqdm.tqdm(dmrs)):
+    for k, (cell_type, chrom, start, end) in enumerate(dmrs):
         j = cell_type_dict[cell_type]
         mask = np.ones(M.shape[0], dtype=bool)
         mask[j] = False
@@ -86,22 +85,23 @@ def create_mask(marker_filepath, atlas_filepath, out_filepath, out_filepath2):
     return p_values
 
 
-p_values = create_mask(
-    os.path.join(ROOT, '..', 'dmrs', 'Annotation_tcga_30_50bp_4CPG.txt'),
-    os.path.join(DATA_DIR, 'atlas30_50bp.npz'),
-    os.path.join(ROOT, '..', 'dmrs', 'mask-balanced-30_50bp.npy'),
-    os.path.join(ROOT, '..', 'dmrs', 'mask-significant-30_50bp.npy')
-)
+#p_values = create_mask(
+#    os.path.join(ROOT, '..', 'dmrs', 'Annotation_tcga_30_50bp_4CPG.txt'),
+#    os.path.join(DATA_DIR, 'atlas30_50bp.npz'),
+#    os.path.join(ROOT, '..', 'dmrs', 'mask-balanced-30_50bp.npy'),
+#    os.path.join(ROOT, '..', 'dmrs', 'mask-significant-30_50bp.npy')
+#)
+
+#p_values = create_mask(
+#    os.path.join(ROOT, '..', 'dmrs', 'Annotation_tcga_30_100bp_4CPG.txt'),
+#    os.path.join(DATA_DIR, 'atlas30_100bp.npz'),
+#    os.path.join(ROOT, '..', 'dmrs', 'mask-balanced-30_100bp.npy'),
+#    os.path.join(ROOT, '..', 'dmrs', 'mask-significant-30_100bp.npy')
+#)
 
 p_values = create_mask(
-    os.path.join(ROOT, '..', 'dmrs', 'Annotation_tcga_30_100bp_4CPG.txt'),
-    os.path.join(DATA_DIR, 'atlas30_100bp.npz'),
-    os.path.join(ROOT, '..', 'dmrs', 'mask-balanced-30_100bp.npy'),
-    os.path.join(ROOT, '..', 'dmrs', 'mask-significant-30_100bp.npy')
-)
-
-p_values = create_mask(
-    os.path.join(ROOT, '..', 'dmrs', 'v7_TCGA_regions_4CpG_250l_500bpdist.txt'),
+    #os.path.join(ROOT, '..', 'dmrs', 'v7_TCGA_regions_4CpG_250l_500bpdist.txt'),
+    os.path.join(ROOT, '..', 'dmrs', 'Annotation_Atlas_v7_30_250bp_4CPG.txt'),
     os.path.join(DATA_DIR, 'atlas.npz'),
     os.path.join(ROOT, '..', 'dmrs', 'mask-balanced-none.npy'),
     os.path.join(ROOT, '..', 'dmrs', 'mask-significant-none.npy')
