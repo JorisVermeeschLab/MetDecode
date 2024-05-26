@@ -40,6 +40,11 @@ parser.add_argument(
     action='store_true',
     help='Whether to disable unsupervised deconvolution'
 )
+parser.add_argument(
+    '--sum1',
+    action='store_true',
+    help='Whether cell type proportions should sum up to one'
+)
 args = parser.parse_args()
 
 # Input and output files
@@ -84,7 +89,8 @@ model = MetDecode(
     D_cfdna,
     n_unknown_tissues=args.n_unknown_tissues,
     coverage=not args.no_coverage,
-    unsupervised=not args.supervised
+    unsupervised=not args.supervised,
+    sum1=args.sum1
 )
 alpha = model.deconvolute()
 

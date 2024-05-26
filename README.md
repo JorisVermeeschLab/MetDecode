@@ -36,8 +36,10 @@ in the reference atlas) needs to be modelled, this can be specified with the `-n
 python3 run.py example-data/atlas.tsv example-data/cfdna.tsv output.csv -n-unknown-tissues 1
 ```
 
-When `-n-unknown-tissues` is strictly greater than 1, the sum of each row in `output.csv` is no longer guaranteed to be
-equal to 1, as the difference corresponds to the estimated contribution from the unknown tissue.
+By default, the sum of cell type proportions is not equal to 1. However, this constraint can be added using an optional argument:
+```bash
+python3 run.py example-data/atlas.tsv example-data/cfdna.tsv output.csv --sum1
+```
 
 Because MetDecode has been designed for sequencing data and is fed with counts as input, one might consider using the coverage as extra information for more accurate deconvolution. Indeed, in the absence of biases, a higher coverage makes the estimation of the corresponding methylation ratio more reliable. However, in the presence of (biological, technical) biases, such assumption does not hold anymore. To disable the modelling of coverage:
 

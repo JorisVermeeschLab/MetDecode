@@ -22,7 +22,8 @@ class MetDecode:
             X_depths: np.ndarray,
             n_unknown_tissues: int = 0,
             coverage: bool = True,
-            unsupervised: bool = True
+            unsupervised: bool = True,
+            sum1: bool = False
     ):
 
         self.X_methylated: np.ndarray = X_methylated
@@ -34,6 +35,7 @@ class MetDecode:
         self.n_tissues: int = self.n_known_tissues + self.n_unknown_tissues
         self.coverage: bool = coverage
         self.unsupervised: bool = unsupervised
+        self.sum1: bool = sum1
 
         # Add pseudo-counts
         self.R_methylated, self.R_depths = MetDecode.add_pseudo_counts(self.R_methylated, self.R_depths)
@@ -123,8 +125,9 @@ class MetDecode:
             R_atlas = np.concatenate((R_atlas, r[np.newaxis, :]), axis=0)
 
             alpha_hat = MetDecode.nnls(R_atlas, R_cfdna, W_cfdna)
-            alpha_hat += 1e-6
-            alpha_hat /= np.sum(alpha_hat, axis=1)[:, np.newaxis]
+            if self.sum1:
+                alpha_hat += 1e-6
+                alpha_hat /= np.sum(alpha_hat, axis=1)[:, np.newaxis]
 
             n_unknowns -= 1
 
@@ -159,8 +162,10 @@ class MetDecode:
 
             optimizer.zero_grad()
 
-            alpha = torch.exp(alpha_logit)
-            #alpha = torch.softmax(alpha_logit, dim=1)
+            if self.sum1:
+                alpha = torch.softmax(alpha_logit, dim=1)
+            else:
+                alpha = torch.exp(alpha_logit)
             gamma = torch.sigmoid(gamma_logit)
             X_reconstructed = torch.mm(alpha, gamma)
             if self.coverage:
