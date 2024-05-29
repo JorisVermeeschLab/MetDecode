@@ -22,7 +22,8 @@ def fig_a():
     for EXP1 in [True, False]:
 
         if EXP1:
-            METHOD_NAMES = ['celfie', 'nnls', 'qp', 'metdecode-nu', 'metdecode']
+            METHOD_NAMES = ['celfie-nu', 'celfie', 'nnls', 'qp', 'metdecode-nu', 'metdecode']
+            #METHOD_NAMES = ['nnls', 'metdecode-nu', 'metdecode']
         else:
             METHOD_NAMES = ['celfie', 'nnls', 'qp', 'metdecode-nc', 'metdecode']
 
@@ -42,8 +43,11 @@ def fig_a():
             res.append([data[method_name]['sim']['pearson'] for method_name in METHOD_NAMES])
         res = np.asarray(res)
 
-        #colors = ['darkblue', 'royalblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
-        colors = ['darkblue', 'slateblue', 'palevioletred', 'steelblue', 'mediumseagreen', 'yellowgreen', 'tan']
+        if EXP1:
+            colors = ['darkblue', 'royalblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
+        else:
+            #colors = ['darkblue', 'slateblue', 'palevioletred', 'steelblue', 'mediumseagreen', 'yellowgreen', 'tan']
+            colors = ['darkblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
         pretty_names = [
             'BRCA', 'CEAD', 'CESC', 'COAD', 'OV', 'READ', 'B cell', 'CD4+ T-cell', 'CD8+ T-cell',
             'Erythroblast', 'Monocyte', 'Natural killer cell', 'Neutrophil', 'Average']
@@ -73,14 +77,6 @@ def fig_a():
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
 
-            def forward(x):
-                mask = (x > 0.9)
-                return mask * (10 * (x - 0.9) + 0.9) + (~mask) * x
-            def backward(x):
-                mask = (x > 0.9)
-                return mask * (0.1 * (x - 0.9) + 0.9) + (~mask) * x
-            ax.set_yscale('function', functions=(forward, backward))
-
             if k < 14:
                 r = ax.violinplot(ys, showmeans=True, showextrema=True)
                 r['cbars'].set_colors(colors[:len(ys)])
@@ -94,16 +90,33 @@ def fig_a():
                 #plt.xticks(range(1, len(ys) + 1), [''] * len(ys))
                 for side in ['right', 'top', 'bottom']:
                     ax.spines[side].set_visible(False)
-                ax.set_yticks(list(ax.get_yticks()) + [1])
-                ax.set_ylim([None, 1])
+                #ax.set_yticks(list(ax.get_yticks()) + [1])
+                #ax.set_ylim([None, 1])
             else:
-                plt.legend(handles=[
-                    mpatches.Patch(color=colors[0], label='CelFIe'),
-                    mpatches.Patch(color=colors[1], label='NNLS'),
-                    mpatches.Patch(color=colors[2], label='QP'),
-                    mpatches.Patch(color=colors[3], label='MetDecode (unk=0)' if EXP1 else 'MetDecode (no coverage)'),
-                    mpatches.Patch(color=colors[4], label='MetDecode (unk=1)' if EXP1 else 'MetDecode'),
-                ])
+                if EXP1:
+                    plt.legend(handles=[
+                        mpatches.Patch(color=colors[0], label='CelFIe (unk=0)'),
+                        mpatches.Patch(color=colors[1], label='CelFIe (unk=1)'),
+                        mpatches.Patch(color=colors[2], label='NNLS'),
+                        mpatches.Patch(color=colors[3], label='QP'),
+                        mpatches.Patch(color=colors[4], label='MetDecode (unk=0)'),
+                        mpatches.Patch(color=colors[5], label='MetDecode (unk=1)'),
+                    ])
+                    """
+                    plt.legend(handles=[
+                        mpatches.Patch(color=colors[0], label='NNLS'),
+                        mpatches.Patch(color=colors[1], label='MetDecode (unk=0)'),
+                        mpatches.Patch(color=colors[2], label='MetDecode (unk=1)'),
+                    ])
+                    """
+                else:
+                    plt.legend(handles=[
+                        mpatches.Patch(color=colors[0], label='CelFIe'),
+                        mpatches.Patch(color=colors[1], label='NNLS'),
+                        mpatches.Patch(color=colors[2], label='QP'),
+                        mpatches.Patch(color=colors[3], label='MetDecode (no coverage)'),
+                        mpatches.Patch(color=colors[4], label='MetDecode'),
+                    ])
                 plt.axis('off')
                 continue
 
@@ -225,8 +238,8 @@ def fig_c():
 
                 data_method.append(method_name)
                 data_cell_types.append(j)
-                #data_values.append(scipy.stats.pearsonr(gamma_unk, gamma_unk_pred)[0])
-                data_values.append(np.mean(np.square(gamma_unk - gamma_unk_pred)))
+                data_values.append(scipy.stats.pearsonr(gamma_unk, gamma_unk_pred)[0])
+                #data_values.append(np.mean(np.square(gamma_unk - gamma_unk_pred)))
 
     df = pd.DataFrame({
         'cell_types': data_cell_types,
@@ -239,7 +252,7 @@ def fig_c():
     seaborn.swarmplot(ax=ax, data=df, x='cell_types', y='values', hue='Method', palette=['darkslateblue', 'tan'])
     ax.set_xticklabels(cell_type_names, rotation=90)
     ax.set_xlabel('')
-    ax.set_ylabel('MSE of unknown cell type')
+    ax.set_ylabel('Pearson correlation for unknown cell type')
     ax.grid(linestyle='--', alpha=0.6, color='grey', linewidth=0.5)
     ax.spines[['right', 'top']].set_visible(False)
     plt.tight_layout()

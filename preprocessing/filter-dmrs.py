@@ -60,7 +60,7 @@ def create_mask(marker_filepath, atlas_filepath, out_filepath, out_filepath2):
             [np.sum(M[mask, k]), np.sum(D[mask, k]) - np.sum(M[mask, k])],
             [M[j, k], D[j, k] - M[j, k]]
         ]).T
-        p_values.append(scipy.stats.fisher_exact(contingency_table).pvalue)
+        p_values.append(scipy.stats.fisher_exact(contingency_table)[1])
 
     margins = np.asarray(margins)
     p_values = np.asarray(p_values)

@@ -38,7 +38,11 @@ class ExperimentType(enum.Enum):
 
 
 def generate_unknown(R: np.ndarray) -> np.ndarray:
+    m = R.shape[1]
     return np.asarray([random.choice(x) for x in R.T])
+    #lb = np.min(R, axis=0)
+    #ub = np.max(R, axis=0)
+    #return np.random.randint(0, 2, size=m)
 
 
 def generate_mix_dataset(
@@ -87,16 +91,18 @@ def generate_mix_dataset(
     cancer_mask = np.zeros(n_tissues, dtype=bool)
     cancer_mask[:6] = True
 
+    # Inject bias in methylation ratios
+    gamma_biased = 0.8 * gamma + 0.05 * np.random.rand(*gamma.shape) + 0.15 * np.random.rand(gamma.shape[0])[:, np.newaxis]
+    #gamma_biased = gamma
+
     # Compute beta values of cfDNA samples
-    X_gamma = np.dot(alpha, gamma)
+    X_gamma = np.dot(alpha, gamma_biased)
 
     # Random sampling of the methylated counts
     coverage_factor = 1
     R_depths = np.round(R_depths * coverage_factor).astype(int)
     X_depths = np.round(X_depths * coverage_factor).astype(int)
 
-    #R_methylated = np.round(R_depths * gamma).astype(int)
-    #X_methylated = np.round(X_depths * X_gamma).astype(int)
     R_methylated = np.random.binomial(R_depths, gamma)
     X_methylated = np.random.binomial(X_depths, X_gamma)
 
@@ -143,7 +149,7 @@ def evaluate(exp: ExperimentType, dataset: dict, evaluation: Evaluation, exp_id:
     gamma_hat = M_atlas / D_atlas
 
     if exp == ExperimentType.UNKNOWNS:
-        METHOD_NAMES = ['nnls', 'qp', 'celfie', 'metdecode', 'metdecode-nu']
+        METHOD_NAMES = ['nnls', 'qp', 'celfie', 'celfie-nu', 'metdecode', 'metdecode-nu']
     else:
         METHOD_NAMES = ['nnls', 'qp', 'celfie', 'metdecode', 'metdecode-nc']
     for method_name in METHOD_NAMES:
@@ -189,14 +195,17 @@ def evaluate(exp: ExperimentType, dataset: dict, evaluation: Evaluation, exp_id:
             alpha_hat = alpha
         elif method_name == 'celfie':
             from metdecode.celfie import celfie_deconvolute
-            alpha_hat, gamma_hat = celfie_deconvolute(M_cfdna, D_cfdna, M_atlas, D_atlas, max_n_iter=100, n_runs=1, convergence_rate=0.0001, n_unknown_tissues=n_unknown_tissues, verbose=True)
+            alpha_hat, gamma_hat = celfie_deconvolute(M_cfdna, D_cfdna, M_atlas, D_atlas, max_n_iter=1000, n_runs=1, convergence_rate=0.0001, n_unknown_tissues=n_unknown_tissues, verbose=False)
+        elif method_name == 'celfie-nu':
+            from metdecode.celfie import celfie_deconvolute
+            alpha_hat, gamma_hat = celfie_deconvolute(M_cfdna, D_cfdna, M_atlas, D_atlas, max_n_iter=1000, n_runs=1, convergence_rate=0.0001, n_unknown_tissues=0, verbose=False)
         else:
             raise NotImplementedError(f'Unknown deconvolution algorithm "{method_name}"')
         evaluation.add(alpha_hat, dataset['Alpha'], gamma_hat, dataset['Gamma'],
             dataset['X-methylated'], dataset['X-depths'], method_name, exp_id, n_known_tissues)
 
 
-def run_simulation(n_unknown_tissues: int = 0):
+def run_simulation(n_profiles: int = 100, n_unknown_tissues: int = 0):
 
     exp_name = f'unk_{n_unknown_tissues}'
 
@@ -213,7 +222,7 @@ def run_simulation(n_unknown_tissues: int = 0):
         raise NotImplementedError()
     dataset = generate_mix_dataset(
         n_unknown_tissues=nut,
-        n_profiles=100
+        n_profiles=n_profiles
     )
     evaluation = Evaluation()
     exp = ExperimentType.UNKNOWNS if (n_unknown_tissues > 0) else ExperimentType.COVERAGE
@@ -252,15 +261,13 @@ def run_simulation2():
 
 if __name__ == '__main__':
 
-    run_simulation(n_unknown_tissues=0)
-
     #for _ in range(10):
     #    run_simulation2()
 
+    for k in [0, 1]:
+        for _ in range(20):
+            run_simulation(n_unknown_tissues=k, n_profiles=5000)
+
     #for k in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 100]:
     #    for _ in range(10):
-    #        run_simulation(n_unknown_tissues=k)
-
-    #for k in [1]:
-    #    for _ in range(190):
     #        run_simulation(n_unknown_tissues=k)

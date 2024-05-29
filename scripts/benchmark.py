@@ -145,7 +145,7 @@ def process(method, experiment, markers, marker_filter, atlas_with_rep=False, n_
     elif method == 'celfie':
         method = f'celfie-{N_UNKNOWNS}_unk'
         from metdecode.celfie import celfie_deconvolute
-        alpha, _ = celfie_deconvolute(M_cfdna, D_cfdna, M_atlas, D_atlas, max_n_iter=100, n_runs=1, convergence_rate=0.0001, n_unknown_tissues=N_UNKNOWNS, verbose=True)
+        alpha, _ = celfie_deconvolute(M_cfdna, D_cfdna, M_atlas, D_atlas, max_n_iter=1000, n_runs=1, convergence_rate=0.0001, n_unknown_tissues=N_UNKNOWNS, verbose=True)
         out_cell_types = list(cell_types)
         for j in range(N_UNKNOWNS):
             out_cell_types.append(f'Unknown-{j + 1}')
@@ -192,19 +192,26 @@ if __name__ == '__main__':
 
     #for method in ['cancerlocator']:
     #    for experiment in ['all']:
-    #        for markers in ['30_50bp', '30_100bp', '30_250bp']:
+    #        for markers in ['30_250bp']:
     #            for marker_filter in ['all-markers', 'balanced', 'significant']:
     #                for atlas_with_rep in [True]:
     #                    process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=0)
 
     for method in ['celfie']:
-        #for experiment in ['Br66', 'Ov79', 'Colo9345', 'Cer77']:
         for experiment in ['cfdna']:
-            for markers in ['30_50bp', '30_100bp', '30_250bp']:
-                for marker_filter in ['all-markers']:
-                    for atlas_with_rep in [False]:
-                        for n_unknowns in [1]:
+            for markers in ['30_250bp']:
+                for marker_filter in ['all-markers', 'significant', 'balanced']:
+                    for atlas_with_rep in [True, False]:
+                        for n_unknowns in [0, 1]:
                             process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns, override_=True)
+
+    #for method in ['nnls', 'qp']:
+    #    for experiment in ['too-cbc', 'Br62', 'Br66', 'Cer77', 'Cer81', 'Colo', 'Colo9345', 'Ov79', 'Ov9433', 'all-insilico', 'cfdna']:
+    #        for markers in ['30_250bp']:
+    #            for marker_filter in ['all-markers', 'significant', 'balanced']:
+    #                for atlas_with_rep in [True, False]:
+    #                    for n_unknowns in [0]:
+    #                        process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns, override_=True)
 
     #for method in ['celfie']:
     #    for experiment in ['all-insilico']:

@@ -73,7 +73,8 @@ class MetDecode:
         col_meth = col_methylated / col_depths
 
         # Impute missing values
-        meth_prior = np.outer(np.ones(len(row_meth)), col_meth)  # TODO: use survival function of Beta distribution instead
+        meth_prior = np.outer(np.ones(len(row_meth)), col_meth)  # TODO: use survival function of Beta distribution instead?
+        # TODO: would be better taking the sqrt
         meth_prior = np.clip(meth_prior, 0.01, 0.99)
 
         mask = np.logical_or(methylated == 0, methylated == depths)
@@ -125,8 +126,8 @@ class MetDecode:
             R_atlas = np.concatenate((R_atlas, r[np.newaxis, :]), axis=0)
 
             alpha_hat = MetDecode.nnls(R_atlas, R_cfdna, W_cfdna)
+            alpha_hat += 1e-6
             if self.sum1:
-                alpha_hat += 1e-6
                 alpha_hat /= np.sum(alpha_hat, axis=1)[:, np.newaxis]
 
             n_unknowns -= 1

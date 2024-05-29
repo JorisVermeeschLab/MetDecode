@@ -9,7 +9,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 INPUT_DIR = os.path.join(ROOT, '..', 'data')
 
 
-for atlas_modifier in ['30_50bp', '30_100bp', '30_250bp']:
+#for atlas_modifier in ['30_50bp', '30_100bp', '30_250bp']:
+for atlas_modifier in ['30_250bp']:
     for markers in ['all-markers', 'balanced', 'significant']:
         print(atlas_modifier, markers)
 
