@@ -1,24 +1,34 @@
 import os
+import math
 from PIL import Image
 
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-OUT_DIR = os.path.join(ROOT, '..', 'figures')
-os.makedirs(os.path.join(OUT_DIR, 'lo-res', 'compressed'), exist_ok=True)
+for target_folder in ['lo-res', 'hi-res']:
 
-Image.MAX_IMAGE_PIXELS = None
+    ROOT = os.path.dirname(os.path.abspath(__file__))
+    OUT_DIR = os.path.join(ROOT, '..', 'figures')
+    os.makedirs(os.path.join(OUT_DIR, target_folder, 'compressed'), exist_ok=True)
 
-
-def compress(in_filepath, out_filepath):
-    img = Image.open(in_filepath)
-    img = img.convert('P', palette=Image.ADAPTIVE, colors=256)
-    img.save(out_filepath, optimize=True)
+    Image.MAX_IMAGE_PIXELS = None
 
 
-for filename in os.listdir(os.path.join(OUT_DIR, 'lo-res')):
-    in_filepath = os.path.join(OUT_DIR, 'lo-res', filename)
-    out_filepath = os.path.join(OUT_DIR, 'lo-res', 'compressed', filename)
-    if not os.path.isfile(in_filepath):
-        continue
+    def compress(in_filepath: str, out_filepath: str) -> None:
+        img = Image.open(in_filepath)
 
-    compress(in_filepath, out_filepath)
+        total_size = img.size[0] * img.size[1]
+        if total_size >= 40000000:
+            alpha = math.sqrt((40000000 - 1) / total_size)
+            new_size = (int(math.floor(alpha * img.size[0])), int(math.floor(alpha * img.size[1])))
+            img.thumbnail(new_size, Image.Resampling.LANCZOS)
+
+        img = img.convert('P', palette=Image.ADAPTIVE, colors=256)
+        img.save(out_filepath, optimize=True)
+
+
+    for filename in os.listdir(os.path.join(OUT_DIR, target_folder)):
+        in_filepath = os.path.join(OUT_DIR, target_folder, filename)
+        out_filepath = os.path.join(OUT_DIR, target_folder, 'compressed', filename)
+        if not os.path.isfile(in_filepath):
+            continue
+
+        compress(in_filepath, out_filepath)

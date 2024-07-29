@@ -3,7 +3,7 @@ tqdm
 numpy
 scipy
 pandas
-pytorch
+torch
 
 # Generate figures
 matplotlib

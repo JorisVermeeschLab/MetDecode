@@ -32,22 +32,24 @@ def fig_a():
             folder = 'unk_1'
         else:
             folder = 'unk_0'
+        filenames = []
         for filename in os.listdir(os.path.join(OUT_FOLDER, folder)):
 
-            if not (filename.startswith('results-') and filename.endswith('.pkl')):
+            if not ((filename.startswith('results-') and filename.endswith('.pkl'))):
                 continue
             filepath = os.path.join(OUT_FOLDER, folder, filename)
             with open(filepath, 'rb') as f:
                 data = pickle.load(f)
             data = data[0]
             res.append([data[method_name]['sim']['pearson'] for method_name in METHOD_NAMES])
+            filenames.append(filename)
         res = np.asarray(res)
 
         if EXP1:
-            colors = ['darkblue', 'royalblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
+            colors = ['darkblue', 'royalblue', 'darkslateblue', 'mediumvioletred', 'palevioletred', 'tan', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
         else:
             #colors = ['darkblue', 'slateblue', 'palevioletred', 'steelblue', 'mediumseagreen', 'yellowgreen', 'tan']
-            colors = ['darkblue', 'darkslateblue', 'slateblue', 'mediumvioletred', 'palevioletred', 'steelblue', 'darkturquoise', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
+            colors = ['darkblue', 'darkslateblue', 'mediumvioletred', 'palevioletred', 'tan', 'darkcyan', 'mediumseagreen', 'darkgreen', 'green', 'yellowgreen', 'tan']
         pretty_names = [
             'BRCA', 'CEAD', 'CESC', 'COAD', 'OV', 'READ', 'B cell', 'CD4+ T-cell', 'CD8+ T-cell',
             'Erythroblast', 'Monocyte', 'Natural killer cell', 'Neutrophil', 'Average']
@@ -77,6 +79,9 @@ def fig_a():
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
 
+            if k in {0, 5, 10}:
+                ax.set_ylabel('Pearson correlation')
+
             if k < 14:
                 r = ax.violinplot(ys, showmeans=True, showextrema=True)
                 r['cbars'].set_colors(colors[:len(ys)])
@@ -102,13 +107,6 @@ def fig_a():
                         mpatches.Patch(color=colors[4], label='MetDecode (unk=0)'),
                         mpatches.Patch(color=colors[5], label='MetDecode (unk=1)'),
                     ])
-                    """
-                    plt.legend(handles=[
-                        mpatches.Patch(color=colors[0], label='NNLS'),
-                        mpatches.Patch(color=colors[1], label='MetDecode (unk=0)'),
-                        mpatches.Patch(color=colors[2], label='MetDecode (unk=1)'),
-                    ])
-                    """
                 else:
                     plt.legend(handles=[
                         mpatches.Patch(color=colors[0], label='CelFIe'),
