@@ -4,7 +4,8 @@ from typing import List, Tuple
 import argparse
 import shutil
 import sys
-sys.path.insert(0, '..')
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, ROOT)
 
 import numpy as np
 import scipy.stats
@@ -168,7 +169,7 @@ def process(method, experiment, markers, marker_filter, atlas_with_rep=False, n_
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('method', type=str, choices=['metdecode', 'nnls', 'qp', 'celfie', 'qp', 'cancerlocator'], help='Deconvolution algorithm')
+    parser.add_argument('method', type=str, choices=['metdecode', 'nnls', 'qp', 'celfie', 'cancerlocator'], help='Deconvolution algorithm')
     parser.add_argument('experiment', type=str, choices=['too-cbc', 'cfdna', 'Br62', 'Br66', 'Cer77', 'Cer81', 'Colo', 'Colo9345', 'Ov79', 'Ov9433', 'all-insilico', 'all'], help='Input samples to be used')
     parser.add_argument('markers', type=str, choices=['30_250bp', '30_50bp', '30_100bp'])
     parser.add_argument('marker_filter', type=str, choices=['all-markers', 'balanced', 'significant'])
@@ -182,48 +183,11 @@ def main():
         args.markers,
         args.marker_filter,
         atlas_with_rep=args.atlas_with_rep,
-        n_unknowns=args.n_unknowns
+        n_unknowns=args.n_unknowns,
+        override_=True
     )
 
 
 if __name__ == '__main__':
 
-    # main()
-
-    #for method in ['cancerlocator']:
-    #    for experiment in ['all']:
-    #        for markers in ['30_250bp']:
-    #            for marker_filter in ['all-markers', 'balanced', 'significant']:
-    #                for atlas_with_rep in [True]:
-    #                    process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=0)
-
-    for method in ['celfie']:
-        for experiment in ['cfdna']:
-            for markers in ['30_250bp']:
-                for marker_filter in ['all-markers', 'significant', 'balanced']:
-                    for atlas_with_rep in [True, False]:
-                        for n_unknowns in [0, 1]:
-                            process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns, override_=True)
-
-    #for method in ['nnls', 'qp']:
-    #    for experiment in ['too-cbc', 'Br62', 'Br66', 'Cer77', 'Cer81', 'Colo', 'Colo9345', 'Ov79', 'Ov9433', 'all-insilico', 'cfdna']:
-    #        for markers in ['30_250bp']:
-    #            for marker_filter in ['all-markers', 'significant', 'balanced']:
-    #                for atlas_with_rep in [True, False]:
-    #                    for n_unknowns in [0]:
-    #                        process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns, override_=True)
-
-    #for method in ['celfie']:
-    #    for experiment in ['all-insilico']:
-    #        for markers in ['30_50bp', '30_100bp', '30_250bp']:
-    #            for marker_filter in ['significant', 'balanced']:
-    #                for atlas_with_rep in [True, False]:
-    #                    for n_unknowns in [10]:
-    #                        process(method, experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns, override_=True)
-
-    #for experiment in ['too-cbc', 'Br62', 'Br66', 'Cer77', 'Cer81', 'Colo', 'Colo9345', 'Ov79', 'Ov9433']:
-    #    for markers in ['none', '30_50bp', '30_100bp']:
-    #        for marker_filter in ['all-markers', 'balanced', 'significant']:
-    #            for atlas_with_rep in [True, False]:
-    #                for n_unknowns in [0, 1, 2]:
-    #                    process('celfie', experiment, markers, marker_filter, atlas_with_rep=atlas_with_rep, n_unknowns=n_unknowns)
+    main()

@@ -1,11 +1,9 @@
 # In-house data
-data/
 dmrs/
 Metadata_EMseqsamples.xlsx
 table1.csv
 sim-results/
-results/
-results-copy/
+figures/
 
 # External tools
 CancerLocator.jar

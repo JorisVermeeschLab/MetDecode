@@ -5,7 +5,8 @@ import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 import uuid
 import sys
-sys.path.insert(0, '..')
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, ROOT)
 
 import numpy as np
 import scipy.stats
@@ -15,10 +16,12 @@ from metdecode.io import load_input_file, save_counts
 from metdecode.model import MetDecode
 
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+
 DATA_FOLDER = os.path.join(ROOT, 'data')
 ATLAS_FILEPATH = os.path.join(DATA_FOLDER, '30_50bp', 'balanced', 'atlas.tsv')
 CFDNA_FILEPATH = os.path.join(DATA_FOLDER, '30_50bp', 'balanced', 'cfdna.tsv')
+#ATLAS_FILEPATH = os.path.join(DATA_FOLDER, '30_100bp', 'all-markers', 'atlas.tsv')
+#CFDNA_FILEPATH = os.path.join(DATA_FOLDER, '30_100bp', 'all-markers', 'cfdna.tsv')
 
 EXPERIMENT = 'variable-unk'
 assert EXPERIMENT in {'no-unk', 'variable-unk', 'fixed-unk'}
@@ -264,7 +267,7 @@ if __name__ == '__main__':
     #for _ in range(10):
     #    run_simulation2()
 
-    for k in [0, 1]:
+    for k in [1]:
         for _ in range(20):
             run_simulation(n_unknown_tissues=k, n_profiles=5000)
 

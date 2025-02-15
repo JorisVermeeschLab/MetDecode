@@ -1,10 +1,8 @@
-# Dependencies for the algorithm
 tqdm
 numpy
 scipy
 pandas
-torch
-
-# Generate figures
 matplotlib
+scikit-learn
 seaborn
+torch

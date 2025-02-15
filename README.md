@@ -11,7 +11,7 @@ MetDecode is written in Python 3.11. Dependencies can be installed by running:
 pip3 install -r requirements.txt
 ```
 
-To be able to run the tool from any directory (including the `scripts` directory), you will have to first install MetDecode itself:
+To install MetDecode:
 ```bash
 python3 setup.py install --user
 ```
@@ -51,4 +51,76 @@ Another key feature of MetDecode is its ability to refine the input atlas by uns
 
 ```bash
 python3 run.py data/insilico-atlas.tsv insilico-cfdna.tsv output.csv --supervised
+```
+
+---
+
+## Reproducing the results from the paper
+
+First, uncompress the largest data files:
+
+```bash
+python3 scripts/uncompress-data.py
+```
+
+All deconvolution results, except from simulations, are stored in `results/`.
+Simulation results are absent from the repository to to their size.
+
+To reproduce the figures from our paper, you need to run the scripts in `scripts/` as described below.
+Figures will be saved in `figures/`
+
+### Deconvolution of cfDNA samples
+
+```bash
+python3 scripts/analyze-cfdna-results.py
+```
+
+#### Deconvolution benchmarking from scratch
+
+To perform deconvolution from scratch, you can use this command for example:
+
+```bash
+python3 scripts/benchmark.py metdecode cfdna 30_250bp significant
+```
+
+'metdecode' can be replaced by any other method ('nnls', 'qp', 'celfie' or 'cancerlocator').
+DMR size '30_250bp' can be replaced by '30_50bp' or '30_100bp'.
+Atlas DMR filter 'all-markers' can be replaced by 'balanced' or 'significant'.
+
+To be able to run 'celfie', you need to include the CelFiE script available at:
+[https://github.com/christacaggiano/celfie/blob/master/scripts/celfie.py](https://github.com/christacaggiano/celfie/blob/master/scripts/celfie.py)
+inside the `metdecode/` folder.
+
+To be able to run 'cancerlocator', you need to include the CancerLocator.jat available at:
+[https://github.com/jasminezhoulab/CancerLocator](https://github.com/jasminezhoulab/CancerLocator)
+inside the root `MetDecode/` folder.
+
+### Deconvolution of in silico mixes
+
+```bash
+python3 analyze-insilico-results.py
+```
+
+To perform deconvolution from scratch, you can use this command for example:
+```bash
+python3 scripts/benchmark.py metdecode all-insilico 30_250bp significant
+```
+
+### Comparison between CBC and deconvolution
+
+```bash
+python3 scripts/analyze-cbc-results.py
+```
+
+To perform deconvolution from scratch, you can use this command for example:
+```bash
+python3 scripts/benchmark.py metdecode too-cbc 30_250bp significant
+```
+
+### Simulations
+
+```bash
+python3 scripts/loo-simulation.py
+python3 scripts/simulations.py
+python3 scripts/make-sim-figures.py
 ```

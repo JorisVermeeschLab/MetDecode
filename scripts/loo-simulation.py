@@ -6,7 +6,8 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 import uuid
 import sys
 import tqdm
-sys.path.insert(0, '..')
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+sys.path.insert(0, ROOT)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,7 +19,6 @@ from metdecode.io import load_input_file
 from metdecode.model import MetDecode
 
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 DATA_FOLDER = os.path.join(ROOT, 'data')
 ATLAS_FILEPATH = os.path.join(DATA_FOLDER, '30_50bp', 'balanced', 'atlas.tsv')
 CFDNA_FILEPATH = os.path.join(DATA_FOLDER, '30_50bp', 'balanced', 'cfdna.tsv')
