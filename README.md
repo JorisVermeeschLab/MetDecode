@@ -6,6 +6,14 @@ Reference-based deconvolution of methylation patterns
 
 ## Installation
 
+### With pip
+
+```bash
+python3 -m pip install metdecode
+```
+
+### From sources
+
 MetDecode is written in Python 3.11. Dependencies can be installed by running:
 ```bash
 python3 -m pip install .
