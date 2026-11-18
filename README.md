@@ -8,17 +8,19 @@ Reference-based deconvolution of methylation patterns
 
 MetDecode is written in Python 3.11. Dependencies can be installed by running:
 ```bash
-pip3 install -r requirements.txt
+python3 -m pip install .
 ```
 
-To install MetDecode:
+This installs the core package dependencies and the `metdecode` command. To also
+install dependencies used by figures and benchmarking scripts:
 ```bash
-python3 setup.py install --user
+python3 -m pip install ".[analysis]"
 ```
 
 ## Running the tool
 
-To run the tool in command line, you will have to execute the `run.py` with the following 3 positioning arguments:
+Run `metdecode` with the following 3 positioning arguments. The equivalent
+`python3 run.py` invocation remains available when running from the source tree:
 - `atlas-filepath`: TSV file containing the reference atlas. For the input file format, please refer to `data/atlas.tsv` for example. Each tissue / cell type has two dedicated columns, namely the number of methylated CpG sites spanned in the marker region, and the total number of CpG sites (both methylation and unmethylated). Each row corresponds to a marker region. The first 3 columns contain respectively the chromosome, start position and end position of each marker region. The file must contain a header of the form: CHROM    START   END TISSUE1_METH    TISSUE1_DEPTH   TISSUE2_METH    ...
 - `cfdna-filepath`: TSV file containing the cfDNA samples. The input file format is similar to `atlas-filepath`, please refer to `data/insilico-cfdna.tsv` for example.
 - `out-filepath`: Output CSV file. It will contain the estimations for the cell type contributions. Number of rows (excluding the header) will be equal to the number of cfDNA samples, and the number of columns will be equal to the number of tissues / cell types in the reference atlas.  
@@ -26,31 +28,31 @@ To run the tool in command line, you will have to execute the `run.py` with the 
 The following command runs MetDecode on _in-silico_-generated data with default hyper-parameters.
 
 ```bash
-python3 run.py example-data/atlas.tsv example-data/cfdna.tsv output.csv
+metdecode example-data/atlas.tsv example-data/cfdna.tsv output.csv
 ```
 
 If an unknown contributor (a tissue / cell type suspected to be present in the cfDNA mixtures but not present 
 in the reference atlas) needs to be modelled, this can be specified with the `-n-unknown-tissues` optional argument:
 
 ```bash
-python3 run.py example-data/atlas.tsv example-data/cfdna.tsv output.csv -n-unknown-tissues 1
+metdecode example-data/atlas.tsv example-data/cfdna.tsv output.csv -n-unknown-tissues 1
 ```
 
 By default, the sum of cell type proportions is not equal to 1. However, this constraint can be added using an optional argument:
 ```bash
-python3 run.py example-data/atlas.tsv example-data/cfdna.tsv output.csv --sum1
+metdecode example-data/atlas.tsv example-data/cfdna.tsv output.csv --sum1
 ```
 
 Because MetDecode has been designed for sequencing data and is fed with counts as input, one might consider using the coverage as extra information for more accurate deconvolution. Indeed, in the absence of biases, a higher coverage makes the estimation of the corresponding methylation ratio more reliable. However, in the presence of (biological, technical) biases, such assumption does not hold anymore. To disable the modelling of coverage:
 
 ```bash
-python3 run.py data/insilico-atlas.tsv insilico-cfdna.tsv output.csv --no-coverage
+metdecode data/insilico-atlas.tsv insilico-cfdna.tsv output.csv --no-coverage
 ```
 
 Another key feature of MetDecode is its ability to refine the input atlas by unsupervised deconvolution. The inference atlas should be as accurate as the number of input cfDNA samples is large. If this is not the case, you may consider to disable unsupervised deconvolution:
 
 ```bash
-python3 run.py data/insilico-atlas.tsv insilico-cfdna.tsv output.csv --supervised
+metdecode data/insilico-atlas.tsv insilico-cfdna.tsv output.csv --supervised
 ```
 
 ---
