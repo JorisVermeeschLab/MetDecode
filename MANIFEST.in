@@ -1,0 +1,13 @@
+include README.md
+include LICENSE
+
+prune data
+prune example-data
+prune preprocessing
+prune results
+prune scripts
+
+exclude run.py
+exclude requirements.txt
+
+global-exclude __pycache__ *.py[cod] .DS_Store
